@@ -1,6 +1,8 @@
 pragma solidity ^0.4.0;
 
-contract SimpleWrite {
+import "zeppelin-solidity/contracts/Ownable.sol";
+
+contract SimpleWrite is Ownable {
   uint public constant REGISTRATION_PRICE_PER_B = 10000;
 
   // constructor

@@ -3,26 +3,48 @@ contract('SimpleWrite', function(accounts) {
     it("can create contract", function(done) {
       SimpleWrite.new()
         .then(function(c) {
-          assert(!!c);
+          assert(!!c)
         })
-        .then(done);
+        .then(done)
     });
 
-    it("owned by oracle", function(done) {
+    it("owned by creator", function(done) {
       var c;
-      var oracle = accounts[3];
-      SimpleWrite.new({from: oracle})
+      var creator = accounts[3];
+      SimpleWrite.new({from: creator})
         .then(function(_c) {
           c = _c;
           return c.owner();
         })
         .then(function(owner) {
-          assert.equal(owner, oracle);
+          assert.equal(owner, creator);
         })
-        .then(done);
+        .then(done)
     });
 
   });
+
+  describe('write', function(){
+    it("emits write event", function(done) {
+      var holder = accounts[1]
+      var creator = accounts[3]
+      var namespace = 'mediachain.test'
+      var payload = 'deadbeef'
+      SimpleWrite.new({from: creator})
+        .then((s) => {
+          let we = s.Write()
+          we.watch((err, event) =>{
+            assert.equal(event.args.payer, holder)
+            assert.equal(event.args.namespace, namespace)
+            assert.equal(event.args.payload, payload)
+            assert.equal(event.args.value, payload.length * s.REGISTRATION_PRICE_PER_B)
+            we.stopWatching()
+          })
+
+          return s.write(namespace, payload)
+        })
+    })
+  })
 
 
   // describe('registerSong', function(){

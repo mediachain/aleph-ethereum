@@ -1,37 +1,14 @@
 pragma solidity ^0.4.0;
 
-import "./OrderPayment.sol";
-
-/*
- * Main SimpleWrite Token contract
- */
-contract SimpleWrite is OrderPayment {
-
-  uint public constant REGISTRATION_PRICE = 10000;
+contract SimpleWrite {
+  uint public constant REGISTRATION_PRICE_PER_B = 10000;
 
   // constructor
-  function SimpleWrite()
-    OrderPayment() {}
+  function SimpleWrite() {}
 
-  /*
-   * registerSong
-   * Register new song into a namespace
-   *
-   * string namespace: namespace
-   * string song: song id
-   */
   function write(string namespace, bytes payload /* MUST be CBOR */) {
-    placeOrder(namespace, payload, REGISTRATION_PRICE);
+    Write(msg.sender, namespace, payload, payload.length * REGISTRATION_PRICE_PER_B);
   }
 
-  // // internal methods
-  // function placeDeposit(uint value) internal {
-  //   transfer(this, value);
-  // }
-
-  // function sendDeposit(Order order, address account) internal {
-  //   // this.tranfer makes the call external, making
-  //   // msg.sender == this inside transfer
-  //   this.transfer(account, order.value);
-  // }
+  event Write(address payer, string namespace, bytes payload, uint value);
 }

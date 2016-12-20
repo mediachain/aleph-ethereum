@@ -10,9 +10,8 @@ contract('SimpleWrite', function(accounts) {
 
     it("owned by oracle", function(done) {
       var c;
-      var holder = accounts[1];
       var oracle = accounts[3];
-      createFunded(holder, oracle)
+      SimpleWrite.new({from: oracle})
         .then(function(_c) {
           c = _c;
           return c.owner();

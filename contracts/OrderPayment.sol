@@ -23,7 +23,7 @@ contract OrderPayment is Ownable {
 
     Order memory order = Order(msg.sender, value, true);
 
-    placeDeposit(value);
+    // placeDeposit(value);
 
     storeOrders[payload] = order;
     OrderPlaced(order.payer, store, payload, value);
@@ -33,14 +33,14 @@ contract OrderPayment is Ownable {
     Order order = orders[store][payload];
     if (!order.exists) throw;
 
-    sendDeposit(order, account);
+    // sendDeposit(order, account);
 
     OrderCompleted(order.payer, store, payload, order.value);
     delete orders[store][payload];
   }
 
-  function placeDeposit(uint value) internal;
-  function sendDeposit(Order order, address account) internal;
+  // function placeDeposit(uint value) internal;
+  // function sendDeposit(Order order, address account) internal;
 
   event OrderPlaced(address payer, string store, bytes payload, uint value);
   event OrderCompleted(address payer, string store, bytes payload, uint value);

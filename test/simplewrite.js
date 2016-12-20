@@ -1,3 +1,5 @@
+const cbor = require('borc')
+
 contract('SimpleWrite', function(accounts) {
   describe('creation', function(){
     it("can create contract", function(done) {
@@ -26,22 +28,25 @@ contract('SimpleWrite', function(accounts) {
 
   describe('write', function(){
     it("emits write event", function(done) {
-      var holder = accounts[1]
+      var caller = accounts[1]
       var creator = accounts[3]
       var namespace = 'mediachain.test'
-      var payload = 'deadbeef'
-      SimpleWrite.new({from: creator})
+      var payload = cbor.encode({'foo': 'bar'})
+      var payloadHex = '0x' + payload.toString('hex')
+      var price = 1000
+      SimpleWrite.new(price, {from: creator})
         .then((s) => {
           let we = s.Write()
           we.watch((err, event) =>{
-            assert.equal(event.args.payer, holder)
-            assert.equal(event.args.namespace, namespace)
-            assert.equal(event.args.payload, payload)
-            assert.equal(event.args.value, payload.length * s.REGISTRATION_PRICE_PER_B)
+            assert.equal(event.args.payer, caller, "payer")
+            assert.equal(event.args.namespace, namespace, "namespace")
+            assert.equal(event.args.payload, payloadHex, "payload (hex)")
+            assert.equal(event.args.fee.toNumber(), payload.length * price, "fee")
             we.stopWatching()
+            done()
           })
 
-          return s.write(namespace, payload)
+          return s.write(namespace, payloadHex, {from: caller})
         })
     })
   })
@@ -50,7 +55,7 @@ contract('SimpleWrite', function(accounts) {
   // describe('registerSong', function(){
   //   it("can register song", function(done) {
   //     var c;
-  //     var holder = accounts[1];
+  //     var caller = accounts[1];
   //     var payload = 'deadbeef';
   //     var namespace = 'mediachain';
   //     var nsAccount = accounts[2];
@@ -58,14 +63,14 @@ contract('SimpleWrite', function(accounts) {
   //     SimpleWrite.new()
   //       .then(function(_t) {
   //         c = _t;
-  //         return c.registerSong(namespace, song, {from: holder})
+  //         return c.registerSong(namespace, song, {from: caller})
   //       })
   //       .then(function() {
   //         return c.completeOrder(namespace, song,
   //                                    nsAccount, {from: oracle});
   //       })
   //       .then(function(tx) {
-  //         return c.balanceOf(holder);
+  //         return c.balanceOf(caller);
   //       })
   //       .then(function(balance) {
   //         assert.equal(balance, 500000-10000)
@@ -86,7 +91,7 @@ contract('SimpleWrite', function(accounts) {
   //   });
   //   it("emits events on registration", function(done) {
   //     var c;
-  //     var holder = accounts[1];
+  //     var caller = accounts[1];
   //     var song = 'f30b5e64-a8a4-47af-99e2-f1e2aa97e569';
   //     var namespace = 'mediachain';
   //     var nsAccount = accounts[2];
@@ -96,7 +101,7 @@ contract('SimpleWrite', function(accounts) {
   //         c = _t;
   //         var ope = c.OrderPlaced();
   //         ope.watch(function(err, event) {
-  //           assert.equal(event.args.payer, holder);
+  //           assert.equal(event.args.payer, caller);
   //           assert.equal(event.args.store, namespace);
   //           assert.equal(event.args.item, song);
   //           assert.equal(event.args.value, 10000);
@@ -104,7 +109,7 @@ contract('SimpleWrite', function(accounts) {
   //         });
   //         var oce = c.OrderCompleted();
   //         oce.watch(function(err, event) {
-  //           assert.equal(event.args.payer, holder);
+  //           assert.equal(event.args.payer, caller);
   //           assert.equal(event.args.store, namespace);
   //           assert.equal(event.args.item, song);
   //           assert.equal(event.args.value, 10000);
@@ -112,7 +117,7 @@ contract('SimpleWrite', function(accounts) {
   //           done();
   //         });
 
-  //         return c.registerSong(namespace, song, {from: holder})
+  //         return c.registerSong(namespace, song, {from: caller})
   //       })
   //       .then(function() {
   //         return c.completeOrder(namespace, song,

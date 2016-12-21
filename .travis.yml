@@ -8,4 +8,8 @@ cache:
 before_install:
   - npm install -g ethereumjs-testrpc
   - testrpc &
+notifications:
+  slack:
+      on_change: always
+  email: false
 

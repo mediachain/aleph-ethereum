@@ -31,8 +31,8 @@ contract('SimpleWrite', function(accounts) {
       var caller = accounts[1]
       var creator = accounts[3]
       var namespace = 'mediachain.test'
-      var payload = cbor.encode({'foo': 'bar'})
-      var payloadHex = '0x' + payload.toString('hex')
+      var body = cbor.encode({'foo': 'bar'})
+      var bodyHex = '0x' + body.toString('hex')
       var price = 1000
       SimpleWrite.new(price, {from: creator})
         .then((s) => {
@@ -40,13 +40,13 @@ contract('SimpleWrite', function(accounts) {
           we.watch((err, event) =>{
             assert.equal(event.args.payer, caller, "payer")
             assert.equal(event.args.namespace, namespace, "namespace")
-            assert.equal(event.args.payload, payloadHex, "payload (hex)")
-            assert.equal(event.args.fee.toNumber(), payload.length * price, "fee")
+            assert.equal(event.args.body, bodyHex, "body (hex)")
+            assert.equal(event.args.fee.toNumber(), body.length * price, "fee")
             we.stopWatching()
             done()
           })
 
-          return s.write(namespace, payloadHex, {from: caller})
+          return s.write(namespace, bodyHex, {from: caller})
         })
     })
   })

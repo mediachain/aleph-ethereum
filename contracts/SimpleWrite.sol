@@ -10,9 +10,25 @@ contract SimpleWrite is Ownable {
     REGISTRATION_PRICE_PER_B = price;
   }
 
-  function write(string namespace, bytes payload /* MUST be CBOR */) {
-    Write(msg.sender, namespace, payload, payload.length * REGISTRATION_PRICE_PER_B);
+  /*
+  message Statement {
+  string id = 1;
+  string publisher = 2;
+  string namespace = 3;
+  StatementBody body = 4;
+  int64 timestamp = 5;
+  bytes signature = 6;
+  }
+  */
+
+  function write(string namespace, bytes body /* MUST be CBOR */, bytes signature) {
+    Write(msg.sender, namespace, body, body.length * REGISTRATION_PRICE_PER_B);
   }
 
-  event Write(address payer, string namespace, bytes payload, uint fee);
+  event Write(
+    address payer,
+    string namespace,
+    bytes body,
+    uint fee
+  );
 }

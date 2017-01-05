@@ -34,6 +34,7 @@ contract('SimpleWrite', function(accounts) {
       var body = cbor.encode({'foo': 'bar'})
       var bodyHex = '0x' + body.toString('hex')
       var price = 1000
+      var signature = "signature"
       SimpleWrite.new(price, {from: creator})
         .then((s) => {
           let we = s.Write()
@@ -46,7 +47,7 @@ contract('SimpleWrite', function(accounts) {
             done()
           })
 
-          return s.write(namespace, bodyHex, {from: caller})
+          return s.write(namespace, bodyHex, signature, {from: caller})
         })
     })
   })

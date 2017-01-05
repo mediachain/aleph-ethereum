@@ -1,7 +1,7 @@
 pragma solidity ^0.4.0;
 
 import "zeppelin-solidity/contracts/Ownable.sol";
-import "Writer.sol";
+import "./Writer.sol";
 
 contract SimpleWrite is Ownable, Writer {
   uint public REGISTRATION_PRICE_PER_B;

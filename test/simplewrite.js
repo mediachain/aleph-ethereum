@@ -11,8 +11,8 @@ contract('SimpleWrite', function(accounts) {
     });
 
     it("owned by creator", function(done) {
-      var c;
-      var creator = accounts[3];
+      let c;
+      const creator = accounts[3];
       SimpleWrite.new({from: creator})
         .then(function(_c) {
           c = _c;
@@ -28,13 +28,13 @@ contract('SimpleWrite', function(accounts) {
 
   describe('write', function(){
     it("emits write event", function(done) {
-      var caller = accounts[1]
-      var creator = accounts[3]
-      var namespace = 'mediachain.test'
-      var body = cbor.encode({'foo': 'bar'})
-      var bodyHex = '0x' + body.toString('hex')
-      var price = 1000
-      var signature = "signature"
+      const caller = accounts[1]
+      const creator = accounts[3]
+      const namespace = 'mediachain.test'
+      const body = cbor.encode({'foo': 'bar'})
+      const bodyHex = '0x' + body.toString('hex')
+      const price = 1000
+      const signature = "signature"
       SimpleWrite.new(price, {from: creator})
         .then((s) => {
           let we = s.Write()

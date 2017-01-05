@@ -1,8 +1,9 @@
 pragma solidity ^0.4.0;
 
 import "zeppelin-solidity/contracts/Ownable.sol";
+import "Writer.sol";
 
-contract SimpleWrite is Ownable {
+contract SimpleWrite is Ownable, Writer {
   uint public REGISTRATION_PRICE_PER_B;
 
   // constructor
@@ -24,11 +25,4 @@ contract SimpleWrite is Ownable {
   function write(string namespace, bytes body /* MUST be CBOR */, bytes signature) {
     Write(msg.sender, namespace, body, body.length * REGISTRATION_PRICE_PER_B);
   }
-
-  event Write(
-    address payer,
-    string namespace,
-    bytes body,
-    uint fee
-  );
 }

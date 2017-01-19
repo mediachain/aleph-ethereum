@@ -43,16 +43,19 @@ contract('SimpleWrite', function(accounts) {
         namespace: namespace,
         body: body
       }
-      const signature = calculateSignature(stmt, { sign: (b) => web3.eth.sign(caller, b) })
+      // BROKEN: see https://github.com/ethereumjs/testrpc/issues/243
+      //const signature = calculateSignature(stmt, { sign: (b) => web3.eth.sign(caller, b) })
+      const signature = "deadbeef"
 
       SimpleWrite.new(price, {from: creator})
         .then((s) => {
           let we = s.Write()
           we.watch((err, event) =>{
+            console.log("length: " + bodyHex.length)
             assert.equal(event.args.payer, caller, "payer")
             assert.equal(event.args.namespace, namespace, "namespace")
             assert.equal(event.args.body, bodyHex, "body (hex)")
-            assert.equal(event.args.fee.toNumber(), body.length * price, "fee")
+            assert.equal(event.args.fee.toNumber(), (bodyHex.length/2 - 1) * price, "fee")
             we.stopWatching()
             done()
           })

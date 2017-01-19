@@ -1,7 +1,7 @@
 {
-  "name": "simplewrite",
+  "name": "aleph-ethereum",
   "version": "0.0.1",
-  "description": "Simple mediachain writer contract",
+  "description": "mediachain/ethereum bridge",
   "main": "truffle.js",
   "directories": {
     "test": "test"
@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mediachain/aleph.git"
+    "url": "git+https://github.com/mediachain/aleph-ethereum.git"
   },
   "author": "",
   "license": "MIT",

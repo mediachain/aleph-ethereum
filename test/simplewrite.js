@@ -1,5 +1,8 @@
 const cbor = require('borc')
-const { calculateSignature } = require('aleph/lib/metadata/signatures')
+const { b58MultihashForBuffer } = require('aleph/lib/common/util')
+const { EthereumPublisherId } = require('aleph/lib/peer/identity')
+const { makeSimpleStatement } = require('aleph/lib/metadata/statement')
+
 
 contract('SimpleWrite', function(accounts) {
   describe('creation', function(){
@@ -33,34 +36,32 @@ contract('SimpleWrite', function(accounts) {
       const creator = accounts[3]
       const namespace = 'mediachain.test'
       const body = {'foo': 'bar'}
-      const bodyHex = '0x' + cbor.encode(body).toString('hex')
+      const bodyBytes = cbor.encode(body)
+      const bodyHex = '0x' + bodyBytes.toString('hex')
+      const bodyHash = b58MultihashForBuffer(bodyBytes)
       const price = 1000
-      const ts = Math.floor(Date.now() / 1000)
 
-      const stmt = {
-        id: `${caller}:${ts}:0`,
-        publisher: caller,
-        namespace: namespace,
-        body: body
-      }
-      // BROKEN: see https://github.com/ethereumjs/testrpc/issues/243
-      //const signature = calculateSignature(stmt, { sign: (b) => web3.eth.sign(caller, b) })
-      const signature = "deadbeef"
+      console.log('caller account: ', caller)
+      EthereumPublisherId.fromRPCMethod(caller, web3.eth.sign)
+        .then(publisherId => makeSimpleStatement(publisherId, namespace, {object: bodyHash}))
+        .then(stmt => {
+          const signature = '0x' +  stmt.signature.toString('hex')
+          console.log('stmt:', stmt)
 
-      SimpleWrite.new(price, {from: creator})
-        .then((s) => {
-          let we = s.Write()
-          we.watch((err, event) =>{
-            console.log("length: " + bodyHex.length)
-            assert.equal(event.args.payer, caller, "payer")
-            assert.equal(event.args.namespace, namespace, "namespace")
-            assert.equal(event.args.body, bodyHex, "body (hex)")
-            assert.equal(event.args.fee.toNumber(), (bodyHex.length/2 - 1) * price, "fee")
-            we.stopWatching()
-            done()
-          })
+          SimpleWrite.new(price, {from: creator})
+            .then((s) => {
+              let we = s.Write()
+              we.watch((err, event) =>{
+                assert.equal(event.args.payer, caller, "payer")
+                assert.equal(event.args.namespace, namespace, "namespace")
+                assert.equal(event.args.body, bodyHex, "body (hex)")
+                assert.equal(event.args.fee.toNumber(), (bodyHex.length/2 - 1) * price, "fee")
+                we.stopWatching()
+                done()
+              })
 
-          return s.write(namespace, bodyHex, signature, {from: caller})
+              return s.write(namespace, bodyHex, signature, {from: caller})
+            })
         })
     })
   })
